@@ -15,12 +15,14 @@
 
 
 /**
- * All tasks
+ * All tasks page
  */
 Route::get('/', function () {
 
+    // Get all data from database table
     $dati = App\Task::get();
 
+    // Return a 'home.blade.php' View
     return view('home', [
         'todo_items' => $dati
     ]);
@@ -28,19 +30,33 @@ Route::get('/', function () {
 
 
 /**
- * Create a new Task
+ * Create a new Task from form
+ * Form is using method POST, so we are defining a route that
+ * responds only if POST method is used.
  */
 Route::post('/task/create', function () {
-    $new_title = request('input-field--name');
 
+    // Get value posted from input field
+    // If nothing is posted then variable = null
+    // 
+    // @url https://laravel.com/docs/5.8/helpers#method-request
+    $new_title = request('input-field--name', null);
+
+    // Check if value is null
     if ($new_title != null) {
         
+        // Create new Model
         $task = new App\Task;
+
+        // Set a variable
         $task->title = $new_title;
 
+        // Save the Model to DB
         $task->save();
     }
 
+    // Redirect to homepage
+    // @url https://laravel.com/docs/5.8/helpers#method-redirect
     return redirect('/');
 });
 
@@ -51,16 +67,27 @@ Route::post('/task/create', function () {
  */
 Route::get('/task/update/{id}', function ($id) {
 
+    // Get Model by ID
     $task = App\Task::find($id);
 
+    // Toggle is_done value
     if ($task->is_done) {
+
+        // Set a variable
         $task->is_done = false;
+
     } else {
+
+        // Set a variable
         $task->is_done = true;
+
     }
 
+    // Save the Model to DB
     $task->save();
 
+    // Redirect to homepage
+    // @url https://laravel.com/docs/5.8/helpers#method-redirect
     return redirect('/');
 });
 
@@ -69,8 +96,14 @@ Route::get('/task/update/{id}', function ($id) {
  * Delete a database entry
  */
 Route::get('/task/delete/{id}', function ($id) {
+    // Get Model by ID
     $task = App\Task::find($id);
+    
+    // Delete that model instance from DB
     $task->delete();
+
+    // Redirect to homepage
+    // @url https://laravel.com/docs/5.8/helpers#method-redirect
     return redirect('/');
 });
 
@@ -80,8 +113,10 @@ Route::get('/task/delete/{id}', function ($id) {
  */
 Route::get('/task/{mans_id}', function ($mans_id) {
 
+    // Get Model by ID
     $task = App\Task::find($mans_id);
 
+    // Return a 'single-task.blade.php' View
     return view('single-task', [
         'todo_item' => $task
     ]);
